@@ -1,4 +1,4 @@
-name: Fetch HD portrait
+name: Build HD portrait
 
 on:
   push:
@@ -8,35 +8,33 @@ permissions:
   contents: write
 
 jobs:
-  fetch-portrait:
+  build-portrait:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Fetch Harmony portrait if needed
+      - name: Build portrait asset
         shell: bash
         run: |
           set -euo pipefail
           target="assets/harmony-gong-profile-hd.jpg"
+          source64="assets/harmony-gong-profile-hd.jpg.base64"
           if [ -s "$target" ]; then
             echo "HD portrait already present."
             exit 0
           fi
-          mkdir -p assets
-          curl -fL --retry 3 \
-            -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/152 Safari/537.36" \
-            -e "https://www.mindx.us/harmony-gong" \
-            "https://lh3.googleusercontent.com/sitesv/AG8ngQXz7MRvZye-tf6ksbROdpT3oaMs_aHB_0jMJe_Oio8jaAb49aB26ptUoOT4iCyqjOubmq8poFHsAWefZ63JDYIztIZZhSSf5BuXk7wNeKsVZxqH-bFS4f9H7eBfB793UQKqlnSjjTiwiFQAQ1VCRfy1_uxvC55LUOD_D1C27BTPJSBX-JT97uT40OvlrRI=w1280" \
-            -o "$target"
+          test -s "$source64"
+          base64 --decode "$source64" > "$target"
           test -s "$target"
-          file "$target"
+          file "$target" | grep -qi 'JPEG image data'
+          rm "$source64"
       - name: Commit portrait
         shell: bash
         run: |
-          if git status --porcelain -- assets/harmony-gong-profile-hd.jpg | grep -q .; then
+          if git status --porcelain -- assets | grep -q .; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add assets/harmony-gong-profile-hd.jpg
+            git add -A assets
             git commit -m "Add HD Harmony Gong portrait"
             git push
           fi
