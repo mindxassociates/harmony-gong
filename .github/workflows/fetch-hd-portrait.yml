@@ -1,0 +1,38 @@
+name: Fetch HD portrait
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-portrait:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch Harmony portrait if needed
+        shell: bash
+        run: |
+          set -euo pipefail
+          target="assets/harmony-gong-profile-hd.jpg"
+          if [ -s "$target" ]; then
+            echo "HD portrait already present."
+            exit 0
+          fi
+          mkdir -p assets
+          curl -fL --retry 3 "https://lh3.googleusercontent.com/sitesv/AG8ngQXz7MRvZye-tf6ksbROdpT3oaMs_aHB_0jMJe_Oio8jaAb49aB26ptUoOT4iCyqjOubmq8poFHsAWefZ63JDYIztIZZhSSf5BuXk7wNeKsVZxqH-bFS4f9H7eBfB793UQKqlnSjjTiwiFQAQ1VCRfy1_uxvC55LUOD_D1C27BTPJSBX-JT97uT40OvlrRI=w1280" -o "$target"
+          test -s "$target"
+          file "$target"
+      - name: Commit portrait
+        shell: bash
+        run: |
+          if git status --porcelain -- assets/harmony-gong-profile-hd.jpg | grep -q .; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add assets/harmony-gong-profile-hd.jpg
+            git commit -m "Add HD Harmony Gong portrait"
+            git push
+          fi
