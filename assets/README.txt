@@ -1,1 +1,0 @@
-Profile image assets for Harmony Gong.
