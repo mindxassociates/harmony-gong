@@ -6,3 +6,16 @@ const menu=q('.menu'),drawer=q('.drawer'),mainNav=q('.nav nav');
 if(menu&&drawer&&mainNav){drawer.innerHTML=mainNav.innerHTML;const close=()=>{drawer.classList.remove('open');document.body.classList.remove('menu-open');menu.textContent='☰';menu.setAttribute('aria-expanded','false');drawer.setAttribute('aria-hidden','true')};menu.onclick=()=>{const open=!drawer.classList.contains('open');drawer.classList.toggle('open',open);document.body.classList.toggle('menu-open',open);menu.textContent=open?'×':'☰';menu.setAttribute('aria-expanded',String(open));drawer.setAttribute('aria-hidden',String(!open))};qa('a',drawer).forEach(a=>a.addEventListener('click',close));addEventListener('keydown',e=>{if(e.key==='Escape')close()})}
 const links=qa('.nav nav a'),sections=qa('main section[id]');const spy=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id))}),{rootMargin:'-35% 0px -55% 0px'});sections.forEach(s=>spy.observe(s));
 const detail=q('.timeline-detail');qa('.milestone').forEach(m=>m.addEventListener('click',()=>{qa('.milestone').forEach(x=>x.classList.remove('active'));m.classList.add('active');detail.innerHTML=`<span>${m.querySelector('span').textContent}</span><h3>${m.dataset.title}</h3><p>${m.dataset.detail}</p>`}));
+
+// Use Harmony's professional portrait in the hero on both language pages.
+qa('.portrait-card').forEach(card=>{
+  card.innerHTML='';
+  const img=document.createElement('img');
+  img.src='assets/harmony-gong-profile.jpg';
+  img.alt=document.documentElement.lang.startsWith('zh')?'弓唯佳 Harmony Gong 心理治疗师专业照':'Harmony Gong, LMHC-D, LPC professional portrait';
+  img.loading='eager';
+  img.decoding='async';
+  Object.assign(card.style,{overflow:'hidden',padding:'0',display:'block'});
+  Object.assign(img.style,{width:'100%',height:'100%',display:'block',objectFit:'cover',objectPosition:'center 28%'});
+  card.appendChild(img);
+});
